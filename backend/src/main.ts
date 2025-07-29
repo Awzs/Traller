@@ -6,13 +6,20 @@ import { Server } from 'http';
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
-  const app = await NestFactory.create(AppModule, {
-    // 生产环境日志配置
-    logger: process.env.NODE_ENV === 'production'
-      ? ['error', 'warn', 'log']
-      : ['error', 'warn', 'log', 'debug', 'verbose'],
-    bodyParser: true,
-  });
+  try {
+    logger.log('🚀 Starting Traller Backend Application...');
+    logger.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    logger.log(`🔌 Port: ${process.env.PORT || 8080}`);
+
+    const app = await NestFactory.create(AppModule, {
+      // 生产环境日志配置
+      logger: process.env.NODE_ENV === 'production'
+        ? ['error', 'warn', 'log']
+        : ['error', 'warn', 'log', 'debug', 'verbose'],
+      bodyParser: true,
+    });
+
+    logger.log('✅ NestJS application created successfully');
 
   // 启用CORS - 生产环境优化
   app.enableCors({
@@ -40,14 +47,16 @@ async function bootstrap() {
   const server = (await app.listen(port, host)) as Server;
   server.setTimeout(300000); // 5分钟超时
 
-  // 优化日志输出
-  logger.log(`🚀 Application is running on: http://${host}:${port}`);
-  logger.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.log(`⏱️  Server timeout set to 5 minutes for long-running API calls`);
-
-  // 生产环境健康检查
-  if (process.env.NODE_ENV === 'production') {
+    // 优化日志输出
+    logger.log(`🚀 Application is running on: http://${host}:${port}`);
+    logger.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    logger.log(`⏱️  Server timeout set to 5 minutes for long-running API calls`);
     logger.log('🏥 Health check endpoint available at /health');
+    logger.log('✅ Application bootstrap completed successfully');
+
+  } catch (error) {
+    logger.error('❌ Failed to bootstrap the application', error);
+    throw error;
   }
 }
 
