@@ -29,6 +29,10 @@ RUN ls -la tsconfig.json || echo "tsconfig.json not found!"
 # 构建应用
 RUN pnpm run build
 
+# 调试：检查构建结果
+RUN echo "=== Build completed, checking dist directory ===" && ls -la dist/ || echo "dist directory not found!"
+RUN echo "=== Checking for main.js ===" && ls -la dist/main.js || echo "main.js not found!"
+
 # 生产阶段
 FROM node:20-alpine AS production
 
@@ -54,6 +58,11 @@ RUN pnpm install --frozen-lockfile --prod
 
 # 从构建阶段复制构建产物
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+
+# 调试：检查生产阶段的文件
+RUN echo "=== Production stage file check ===" && ls -la
+RUN echo "=== Checking dist directory in production ===" && ls -la dist/ || echo "dist directory not found in production!"
+RUN echo "=== Checking for main.js in production ===" && ls -la dist/main.js || echo "main.js not found in production!"
 
 # 切换到非root用户
 USER nestjs
