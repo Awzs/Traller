@@ -1,17 +1,24 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { Server } from 'http';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
   const app = await NestFactory.create(AppModule, {
-    // 增加请求超时时间
+    // 生产环境日志配置
+    logger: process.env.NODE_ENV === 'production'
+      ? ['error', 'warn', 'log']
+      : ['error', 'warn', 'log', 'debug', 'verbose'],
     bodyParser: true,
   });
 
-  // 启用CORS
+  // 启用CORS - 生产环境优化
   app.enableCors({
-    origin: true,
+    origin: process.env.NODE_ENV === 'production'
+      ? [process.env.FRONTEND_URL, process.env.ALLOWED_ORIGINS].filter(Boolean)
+      : true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -25,17 +32,40 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.PORT ?? 3000;
+  // 动态端口配置 - Cloud Run使用8080
+  const port = process.env.PORT || 8080;
+  const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
-  // 设置服务器超时时间为5分钟
-  const server = (await app.listen(port)) as Server;
+  // 设置服务器超时时间
+  const server = (await app.listen(port, host)) as Server;
   server.setTimeout(300000); // 5分钟超时
 
-  console.log(`Application is running on: http://localhost:${port}`);
-  console.log('Server timeout set to 5 minutes for long-running API calls');
+  // 优化日志输出
+  logger.log(`🚀 Application is running on: http://${host}:${port}`);
+  logger.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`⏱️  Server timeout set to 5 minutes for long-running API calls`);
+
+  // 生产环境健康检查
+  if (process.env.NODE_ENV === 'production') {
+    logger.log('🏥 Health check endpoint available at /health');
+  }
 }
 
 bootstrap().catch((err) => {
-  console.error('Failed to bootstrap the application', err);
+  const logger = new Logger('Bootstrap');
+  logger.error('❌ Failed to bootstrap the application', err);
   process.exit(1);
+});
+
+// 优雅关闭处理
+process.on('SIGTERM', () => {
+  const logger = new Logger('Shutdown');
+  logger.log('🛑 SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  const logger = new Logger('Shutdown');
+  logger.log('🛑 SIGINT received, shutting down gracefully');
+  process.exit(0);
 });

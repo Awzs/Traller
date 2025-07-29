@@ -122,6 +122,84 @@ chmod +x ./deploy.sh
 - ✅ **超时处理**: 针对 Vercel 免费版时间限制进行优化
 - ✅ **错误恢复**: 多重 API 服务备份，确保服务稳定性
 
+## ☁️ 部署到 Google Cloud
+
+### 前置要求
+
+1. 安装 [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+2. 安装 [Docker](https://docs.docker.com/get-docker/)
+3. 创建 Google Cloud 项目并启用计费
+
+### 快速部署
+
+使用自动化部署脚本：
+
+```bash
+# 设置项目ID
+export GCP_PROJECT_ID="your-project-id"
+
+# 完整部署（首次部署推荐）
+./deploy-gcp.sh
+
+# 或快速部署（适用于已配置环境）
+./quick-deploy-gcp.sh
+```
+
+### 手动部署步骤
+
+1. **配置 Google Cloud**:
+   ```bash
+   gcloud auth login
+   gcloud config set project YOUR_PROJECT_ID
+   gcloud services enable cloudbuild.googleapis.com run.googleapis.com
+   ```
+
+2. **构建和部署后端**:
+   ```bash
+   cd backend
+   gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/traller-backend
+   gcloud run deploy traller-backend \
+     --image gcr.io/YOUR_PROJECT_ID/traller-backend \
+     --platform managed \
+     --region asia-east1 \
+     --allow-unauthenticated
+   ```
+
+3. **构建和部署前端**:
+   ```bash
+   cd frontend
+   gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/traller-frontend
+   gcloud run deploy traller-frontend \
+     --image gcr.io/YOUR_PROJECT_ID/traller-frontend \
+     --platform managed \
+     --region asia-east1 \
+     --allow-unauthenticated
+   ```
+
+### 环境变量配置
+
+在 Cloud Run 控制台或通过命令行配置以下环境变量：
+
+**后端服务必需变量**:
+- `NODE_ENV=production`
+- `MONGODB_URI`: MongoDB 连接字符串
+- `PERPLEXITY_API_KEY`: Perplexity API 密钥
+- `TAVILY_API_KEY`: Tavily API 密钥
+- `OPENROUTER_API_KEY`: OpenRouter API 密钥
+
+**可选变量**:
+- `FRONTEND_URL`: 前端服务URL（用于CORS配置）
+- `ALLOWED_ORIGINS`: 允许的其他域名
+
+### 生产环境特性
+
+- ✅ **容器化部署**: 使用 Docker 多阶段构建优化镜像大小
+- ✅ **自动扩缩容**: Cloud Run 根据流量自动调整实例数量
+- ✅ **健康检查**: 内置健康检查端点 `/health`
+- ✅ **优雅关闭**: 支持 SIGTERM/SIGINT 信号处理
+- ✅ **日志聚合**: 所有日志输出到 stdout/stderr，由 Cloud Logging 收集
+- ✅ **安全配置**: 非 root 用户运行，最小权限原则
+
 ## 📸 项目截图
 
 ![image](./frontend/public/images/logos/image.png)

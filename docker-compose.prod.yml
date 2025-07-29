@@ -1,0 +1,76 @@
+# Docker Compose 生产环境配置
+# 用于本地测试生产环境构建
+
+version: '3.8'
+
+services:
+  # MongoDB 数据库
+  mongodb:
+    image: mongo:7.0
+    container_name: traller-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: traller
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - traller-network
+
+  # 后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: traller-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/traller?authSource=admin
+      - FRONTEND_URL=http://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - traller-network
+    healthcheck:
+      test: ["CMD", "node", "dist/health-check.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: traller-frontend
+    restart: unless-stopped
+    environment:
+      - BACKEND_URL=http://backend:8080
+    ports:
+      - "3000:8080"
+    depends_on:
+      - backend
+    networks:
+      - traller-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  traller-network:
+    driver: bridge
