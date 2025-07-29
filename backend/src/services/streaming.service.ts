@@ -194,8 +194,8 @@ export class StreamingService {
   sendChunkedResponse(res: Response, data: any, chunkSize: number = 1000): void {
     try {
       const jsonString = JSON.stringify(data);
-      const chunks = [];
-      
+      const chunks: string[] = [];
+
       // Split data into chunks
       for (let i = 0; i < jsonString.length; i += chunkSize) {
         chunks.push(jsonString.slice(i, i + chunkSize));
