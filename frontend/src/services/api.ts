@@ -6,7 +6,7 @@ import type {
 } from "@/types";
 
 const api = axios.create({
-  baseURL: "https://traller.shop",
+  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:3000",
   timeout: 240000, // 4 minutes timeout, providing sufficient time for backend processing
   headers: {
     "Content-Type": "application/json",

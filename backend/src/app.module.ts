@@ -9,6 +9,8 @@ import { GeminiService } from './services/gemini.service';
 import { PerplexityService } from './services/perplexity.service';
 import { TavilyService } from './services/tavily.service';
 import { JsonRepairService } from './services/json-repair.service';
+import { CacheService } from './services/cache.service';
+import { StreamingService } from './services/streaming.service';
 import { QueryResult, QueryResultSchema } from './entities/query-result.entity';
 import {
   EntityRelationship,
@@ -38,6 +40,8 @@ import { getDatabaseConfig } from './config/database.config';
     PerplexityService,
     TavilyService,
     JsonRepairService,
+    CacheService,
+    StreamingService,
   ],
 })
 export class AppModule {}

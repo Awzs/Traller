@@ -1,16 +1,42 @@
 {
-	"dependencies": {
-		"@nestjs/config": "^4.0.2",
-		"@nestjs/typeorm": "^11.0.0",
-		"@types/dagre": "^0.7.53",
-		"@types/p5": "^1.7.6",
-		"axios": "^1.11.0",
-		"class-transformer": "^0.5.1",
-		"class-validator": "^0.14.2",
-		"dagre": "^0.8.5",
-		"react-p5": "^1.4.1",
-		"sonner": "^2.0.6",
-		"sqlite3": "^5.1.7",
-		"typeorm": "^0.3.25"
-	}
+  "name": "traller",
+  "version": "1.0.0",
+  "description": "一个可视化的智能研究代理",
+  "main": "api/index.ts",
+  "scripts": {
+    "dev": "./start.sh",
+    "build": "cd backend && pnpm run build && cd ../frontend && pnpm run build",
+    "start": "cd backend && pnpm run start:prod",
+    "deploy": "./deploy.sh",
+    "install:all": "pnpm install && cd backend && pnpm install && cd ../frontend && pnpm install"
+  },
+  "keywords": ["ai", "research", "visualization", "knowledge-graph"],
+  "author": "Awzs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Awzs/Traller.git"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/platform-express": "^11.0.1",
+    "axios": "^1.11.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "mongoose": "^8.16.4",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

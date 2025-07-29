@@ -53,7 +53,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/your-username/Traller.git
+git clone git@github.com:Awzs/Traller.git
 cd Traller
 ```
 
@@ -74,6 +74,53 @@ chmod +x ./start.sh
 
 - **🖥️ 前端应用**: `http://localhost:5173`
 - **⚙️ 后端服务**: `http://localhost:3000`
+
+## 🌐 部署到 Vercel
+
+### 前置要求
+
+1. 安装 [Vercel CLI](https://vercel.com/cli)：
+   ```bash
+   npm i -g vercel
+   ```
+
+2. 准备环境变量：
+   - 复制 `.env.example` 为 `.env`
+   - 填入必要的 API 密钥
+
+### 快速部署
+
+使用提供的部署脚本：
+
+```bash
+chmod +x ./deploy.sh
+./deploy.sh
+```
+
+### 手动部署
+
+1. 登录 Vercel：
+   ```bash
+   vercel login
+   ```
+
+2. 部署项目：
+   ```bash
+   vercel --prod
+   ```
+
+3. 在 Vercel 控制台配置环境变量：
+   - `MONGODB_URI`: MongoDB 连接字符串
+   - `PERPLEXITY_API_KEY`: Perplexity API 密钥
+   - `TAVILY_API_KEY`: Tavily API 密钥
+   - `OPENROUTER_API_KEY`: OpenRouter API 密钥
+
+### 部署特性
+
+- ✅ **自动缓存**: 实现了智能缓存机制，避免重复请求
+- ✅ **流式响应**: 支持 Server-Sent Events，实时显示处理进度
+- ✅ **超时处理**: 针对 Vercel 免费版时间限制进行优化
+- ✅ **错误恢复**: 多重 API 服务备份，确保服务稳定性
 
 ## 📸 项目截图
 
