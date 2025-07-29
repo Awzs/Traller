@@ -25,11 +25,7 @@ import { getDatabaseConfig } from './config/database.config';
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        const config = getDatabaseConfig(configService);
-        console.log('🔗 Attempting to connect to MongoDB...');
-        return config;
-      },
+      useFactory: getDatabaseConfig,
     }),
     MongooseModule.forFeature([
       { name: QueryResult.name, schema: QueryResultSchema },
