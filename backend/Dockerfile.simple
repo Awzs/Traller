@@ -1,0 +1,62 @@
+# 简化版Dockerfile - 单阶段构建
+FROM node:20-alpine
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装dumb-init用于信号处理
+RUN apk add --no-cache dumb-init
+
+# 复制package文件
+COPY backend/package*.json ./
+COPY backend/pnpm-lock.yaml ./
+
+# 安装pnpm
+RUN npm install -g pnpm
+
+# 安装所有依赖（包括开发依赖，用于构建）
+RUN pnpm install --frozen-lockfile
+
+# 复制源代码和配置文件
+COPY backend/ .
+
+# 调试：显示文件结构
+RUN echo "=== Files before build ===" && ls -la
+RUN echo "=== TypeScript config ===" && cat tsconfig.json
+
+# 构建应用
+RUN echo "=== Starting build ===" && \
+    pnpm run build && \
+    echo "=== Build completed ==="
+
+# 调试：检查构建结果
+RUN echo "=== Checking dist after build ===" && ls -la dist/
+RUN echo "=== Checking main.js ===" && ls -la dist/main.js
+
+# 清理开发依赖（可选，为了减小镜像大小）
+RUN pnpm prune --prod
+
+# 创建非root用户
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# 更改文件所有权
+RUN chown -R nestjs:nodejs /app
+
+# 切换到非root用户
+USER nestjs
+
+# 暴露端口
+EXPOSE 8080
+
+# 设置环境变量
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:8080/', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
+
+# 使用dumb-init启动应用
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/main.js"]
