@@ -38,7 +38,7 @@ steps:
       - '--timeout=300'
       - '--concurrency=100'
       - '--max-instances=10'
-      - '--set-env-vars=NODE_ENV=production,PORT=8080'
+      - '--set-env-vars=NODE_ENV=production'
     id: 'deploy-backend'
     waitFor: ['push-backend']
 
