@@ -6,11 +6,13 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
+      - '-f'
+      - 'backend/Dockerfile'
       - '-t'
       - 'gcr.io/$PROJECT_ID/traller-backend:$BUILD_ID'
       - '-t'
       - 'gcr.io/$PROJECT_ID/traller-backend:latest'
-      - './backend'
+      - '.'
     id: 'build-backend'
 
   # 推送后端镜像

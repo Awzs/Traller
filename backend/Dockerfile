@@ -5,8 +5,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # 复制package文件
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+COPY backend/package*.json ./
+COPY backend/pnpm-lock.yaml ./
 
 # 安装pnpm
 RUN npm install -g pnpm
@@ -15,7 +15,7 @@ RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile
 
 # 复制源代码和配置文件
-COPY . .
+COPY backend/ .
 
 # 调试：显示当前目录内容
 RUN echo "=== Current directory contents ===" && ls -la
@@ -43,8 +43,8 @@ RUN adduser -S nestjs -u 1001
 WORKDIR /app
 
 # 复制package文件
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+COPY backend/package*.json ./
+COPY backend/pnpm-lock.yaml ./
 
 # 安装pnpm
 RUN npm install -g pnpm
