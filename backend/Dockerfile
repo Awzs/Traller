@@ -32,6 +32,7 @@ RUN pnpm run build
 # 调试：检查构建结果
 RUN echo "=== Build completed, checking dist directory ===" && ls -la dist/ || echo "dist directory not found!"
 RUN echo "=== Checking for main.js ===" && ls -la dist/main.js || echo "main.js not found!"
+RUN echo "=== Checking all files in dist ===" && find dist -type f || echo "No files in dist!"
 
 # 生产阶段
 FROM node:20-alpine AS production
