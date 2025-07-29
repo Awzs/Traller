@@ -16,6 +16,5 @@ export const getDatabaseConfig = (
     socketTimeoutMS: 45000,
     // 在生产环境中，如果连接失败，不要阻止应用启动
     bufferCommands: false,
-    bufferMaxEntries: 0,
   };
 };
