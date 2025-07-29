@@ -14,8 +14,11 @@ RUN npm install -g pnpm
 # 安装依赖
 RUN pnpm install --frozen-lockfile
 
-# 复制源代码
+# 复制源代码和配置文件
 COPY . .
+
+# 确保TypeScript配置文件存在
+RUN ls -la tsconfig.json || echo "tsconfig.json not found!"
 
 # 构建应用
 RUN pnpm run build
@@ -58,7 +61,7 @@ ENV PORT=8080
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node dist/health-check.js || exit 1
+  CMD node -e "require('http').get('http://localhost:8080/', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
 
 # 使用dumb-init启动应用
 ENTRYPOINT ["dumb-init", "--"]
