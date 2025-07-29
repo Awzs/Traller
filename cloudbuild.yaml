@@ -4,7 +4,7 @@
 steps:
   # 构建后端镜像
   - name: 'gcr.io/cloud-builders/docker'
-    args: 
+    args:
       - 'build'
       - '-t'
       - 'gcr.io/$PROJECT_ID/traller-backend:$BUILD_ID'
@@ -12,17 +12,6 @@ steps:
       - 'gcr.io/$PROJECT_ID/traller-backend:latest'
       - './backend'
     id: 'build-backend'
-
-  # 构建前端镜像
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/traller-frontend:$BUILD_ID'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/traller-frontend:latest'
-      - './frontend'
-    id: 'build-frontend'
 
   # 推送后端镜像
   - name: 'gcr.io/cloud-builders/docker'
@@ -32,22 +21,14 @@ steps:
     id: 'push-backend'
     waitFor: ['build-backend']
 
-  # 推送前端镜像
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - 'gcr.io/$PROJECT_ID/traller-frontend:$BUILD_ID'
-    id: 'push-frontend'
-    waitFor: ['build-frontend']
-
   # 部署后端到 Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'traller-backend'
+      - 'traller'
       - '--image=gcr.io/$PROJECT_ID/traller-backend:$BUILD_ID'
-      - '--region=asia-east1'
+      - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--memory=1Gi'
@@ -55,27 +36,9 @@ steps:
       - '--timeout=300'
       - '--concurrency=100'
       - '--max-instances=10'
-      - '--set-env-vars=NODE_ENV=production'
+      - '--set-env-vars=NODE_ENV=production,PORT=8080'
     id: 'deploy-backend'
     waitFor: ['push-backend']
-
-  # 部署前端到 Cloud Run
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - 'traller-frontend'
-      - '--image=gcr.io/$PROJECT_ID/traller-frontend:$BUILD_ID'
-      - '--region=asia-east1'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-      - '--memory=512Mi'
-      - '--cpu=1'
-      - '--timeout=60'
-      - '--concurrency=100'
-      - '--max-instances=5'
-    id: 'deploy-frontend'
-    waitFor: ['push-frontend']
 
 # 构建选项
 options:
@@ -89,6 +52,4 @@ timeout: '1200s'
 # 镜像推送
 images:
   - 'gcr.io/$PROJECT_ID/traller-backend:$BUILD_ID'
-  - 'gcr.io/$PROJECT_ID/traller-frontend:$BUILD_ID'
   - 'gcr.io/$PROJECT_ID/traller-backend:latest'
-  - 'gcr.io/$PROJECT_ID/traller-frontend:latest'
