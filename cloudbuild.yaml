@@ -7,7 +7,7 @@ steps:
     args:
       - 'build'
       - '-f'
-      - 'backend/Dockerfile.test'
+      - 'backend/Dockerfile'
       - '-t'
       - 'gcr.io/$PROJECT_ID/traller-backend:$BUILD_ID'
       - '-t'

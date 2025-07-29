@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "data": "ts-node -r tsconfig-paths/register scripts/data-access.ts",
+    "clean": "ts-node -r tsconfig-paths/register scripts/clean-data.ts",
     "test:service": "ts-node -r tsconfig-paths/register scripts/test-service.ts",
     "test:service:local": "NO_PROXY=localhost,127.0.0.1 pnpm test:service"
   },
