@@ -17,6 +17,12 @@ RUN pnpm install --frozen-lockfile
 # 复制源代码和配置文件
 COPY . .
 
+# 调试：显示当前目录内容
+RUN echo "=== Current directory contents ===" && ls -la
+
+# 调试：显示工作目录
+RUN echo "=== Current working directory ===" && pwd
+
 # 确保TypeScript配置文件存在
 RUN ls -la tsconfig.json || echo "tsconfig.json not found!"
 
